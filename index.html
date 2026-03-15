@@ -210,14 +210,14 @@
             text-align: center;
         }
 
-        /* 左上角按钮组 */
+        /* 右上角按钮组 */
         .bottom-left-buttons {
             position: absolute;
-            top: 30px;
-            left: 30px;
+            top: 10px;
+            right: -20px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 80px;
             z-index: 100;
         }
 
@@ -358,6 +358,7 @@
         function enterLandscape() {
             const guide = document.getElementById('portrait-guide');
             const main = document.getElementById('landscape-main');
+            const video = document.querySelector('.background-video');
             
             // 尝试锁定横屏（如果浏览器支持）
             if (screen.orientation && screen.orientation.lock) {
@@ -372,6 +373,12 @@
                 main.classList.add('active');
                 // 进入横屏后更新漩涡尺寸
                 updateWhirlpoolSize();
+                // 手动触发视频播放（兼容UC等浏览器）
+                if (video) {
+                    video.play().catch(err => {
+                        console.log('视频播放失败:', err);
+                    });
+                }
             }, 300);
         }
 
