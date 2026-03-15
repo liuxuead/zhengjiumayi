@@ -107,10 +107,6 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
             transform: translate(-50%, -50%) rotate(90deg);
             object-fit: cover;
             z-index: 1;
@@ -342,6 +338,7 @@
         function updateWhirlpoolSize() {
             const whirlpool = document.querySelector('.whirlpool');
             const whirlpoolInner = document.querySelector('.whirlpool-inner');
+            const video = document.querySelector('.background-video');
             
             if (whirlpool && whirlpoolInner) {
                 // 计算屏幕短边
@@ -356,6 +353,13 @@
                 // 设置内圈漩涡尺寸
                 whirlpoolInner.style.width = `${innerDiameter}px`;
                 whirlpoolInner.style.height = `${innerDiameter}px`;
+            }
+            
+            // 设置视频尺寸
+            if (video) {
+                const shortSide = Math.min(window.innerWidth, window.innerHeight);
+                video.style.width = `${shortSide}px`;
+                video.style.height = `${shortSide}px`;
             }
         }
 
