@@ -197,10 +197,10 @@
 
         @keyframes orbit {
             0% {
-                transform: rotate(0deg) translateX(80px) rotate(0deg);
+                transform: rotate(0deg) translateX(150px) rotate(0deg);
             }
             100% {
-                transform: rotate(360deg) translateX(80px) rotate(-360deg);
+                transform: rotate(360deg) translateX(150px) rotate(-360deg);
             }
         }
 
@@ -210,12 +210,13 @@
             text-align: center;
         }
 
-        /* 左下角按钮组 */
+        /* 左上角按钮组 */
         .bottom-left-buttons {
             position: absolute;
-            bottom: 30px;
+            top: 30px;
             left: 30px;
             display: flex;
+            flex-direction: column;
             gap: 20px;
             z-index: 100;
         }
@@ -231,6 +232,7 @@
             cursor: pointer;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transform: rotate(90deg);
         }
 
         .action-btn:hover {
