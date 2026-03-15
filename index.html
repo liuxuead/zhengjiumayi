@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>H5横屏项目</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* 竖屏引导页面 */
+        #portrait-guide {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        #portrait-guide.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .guide-icon {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+            animation: rotatePhone 2s ease-in-out infinite;
+        }
+
+        @keyframes rotatePhone {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+        }
+
+        .guide-text {
+            color: #fff;
+            font-size: 24px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .guide-subtext {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .enter-btn {
+            padding: 15px 50px;
+            background: #fff;
+            color: #667eea;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .enter-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .enter-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 横屏主页面 */
+        #landscape-main {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        #landscape-main.active {
+            display: block;
+        }
+
+        /* 视频层 */
+        .background-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%) rotate(90deg);
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        /* 横屏内容容器 */
+        .landscape-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* CSS漩涡效果 */
+        .whirlpool {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, 
+                rgba(100, 149, 237, 0.3) 0deg, 
+                rgba(70, 130, 180, 0.5) 90deg, 
+                rgba(30, 144, 255, 0.7) 180deg, 
+                rgba(70, 130, 180, 0.5) 270deg, 
+                rgba(100, 149, 237, 0.3) 360deg
+            );
+            animation: spin 8s linear infinite;
+            box-shadow: 0 0 60px rgba(30, 144, 255, 0.6), 
+                        inset 0 0 40px rgba(255, 255, 255, 0.3);
+            z-index: 10;
+        }
+
+        @keyframes spin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* 漩涡内圈 */
+        .whirlpool-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, 
+                rgba(70, 130, 180, 0.4) 0deg, 
+                rgba(30, 144, 255, 0.6) 90deg, 
+                rgba(70, 130, 180, 0.8) 180deg, 
+                rgba(30, 144, 255, 0.6) 270deg, 
+                rgba(70, 130, 180, 0.4) 360deg
+            );
+            animation: spin-reverse 6s linear infinite;
+            z-index: 15;
+            box-shadow: 0 0 40px rgba(30, 144, 255, 0.5),
+                        inset 0 0 30px rgba(255, 255, 255, 0.4);
+        }
+
+        @keyframes spin-reverse {
+            from { transform: translate(-50%, -50%) rotate(360deg); }
+            to { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+
+        /* 蚂蚁效果 */
+        .mayi-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            z-index: 20;
+        }
+
+        .mayi-img {
+            position: absolute;
+            width: 60px;
+            height: auto;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+            animation: orbit 8s linear infinite;
+            transform-origin: center center;
+        }
+
+        @keyframes orbit {
+            0% {
+                transform: rotate(0deg) translateX(80px) rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg) translateX(80px) rotate(-360deg);
+            }
+        }
+
+        .main-title {
+            color: #fff;
+            font-size: 48px;
+            text-align: center;
+        }
+
+        /* 左下角按钮组 */
+        .bottom-left-buttons {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .action-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 竖屏提示遮罩（当用户在横屏模式下切回竖屏时显示） */
+        #rotation-hint {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        #rotation-hint.active {
+            display: flex;
+        }
+
+        .hint-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            animation: shake 1s ease-in-out infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .hint-text {
+            color: #fff;
+            font-size: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- 竖屏引导页面 -->
+    <div id="portrait-guide">
+        <svg class="guide-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="25" y="10" width="50" height="80" rx="5" stroke="white" stroke-width="3" fill="none"/>
+            <circle cx="50" cy="85" r="3" fill="white"/>
+            <rect x="35" y="20" width="30" height="50" rx="2" fill="white" opacity="0.3"/>
+        </svg>
+        <h1 class="guide-text">请旋转手机至横屏</h1>
+        <p class="guide-subtext">为了获得最佳体验，请将手机横置</p>
+        <button class="enter-btn" onclick="enterLandscape()">点击进入横屏模式</button>
+    </div>
+
+    <!-- 横屏主页面 -->
+    <div id="landscape-main">
+        <!-- 视频层 -->
+        <video class="background-video" autoplay loop muted playsinline>
+            <source src="xuanwo.mp4" type="video/mp4">
+        </video>
+        
+        <div class="landscape-content">
+            <!-- CSS漩涡效果 -->
+            <div class="whirlpool"></div>
+            <div class="whirlpool-inner"></div>
+            
+            <!-- 蚂蚁效果 -->
+            <div class="mayi-container">
+                <img class="mayi-img" src="mayi.png" alt="蚂蚁">
+            </div>
+            
+            <h1 class="main-title">横屏模式已开启</h1>
+            
+            <!-- 左下角按钮组 -->
+            <div class="bottom-left-buttons">
+                <button class="action-btn" onclick="handleButton1()">按钮 1</button>
+                <button class="action-btn" onclick="handleButton2()">按钮 2</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 旋转提示遮罩 -->
+    <div id="rotation-hint">
+        <svg class="hint-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="25" y="10" width="50" height="80" rx="5" stroke="white" stroke-width="3" fill="none" transform="rotate(90 50 50)"/>
+            <circle cx="85" cy="50" r="3" fill="white"/>
+            <rect x="35" y="20" width="30" height="50" rx="2" fill="white" opacity="0.3" transform="rotate(90 50 50)"/>
+        </svg>
+        <p class="hint-text">请保持横屏模式</p>
+    </div>
+
+    <script>
+        // 计算并设置漩涡尺寸
+        function updateWhirlpoolSize() {
+            const whirlpool = document.querySelector('.whirlpool');
+            const whirlpoolInner = document.querySelector('.whirlpool-inner');
+            
+            if (whirlpool && whirlpoolInner) {
+                // 计算屏幕短边
+                const shortSide = Math.min(window.innerWidth, window.innerHeight);
+                const diameter = shortSide * 0.75;
+                const innerDiameter = diameter * 0.6;
+                
+                // 设置漩涡尺寸
+                whirlpool.style.width = `${diameter}px`;
+                whirlpool.style.height = `${diameter}px`;
+                
+                // 设置内圈漩涡尺寸
+                whirlpoolInner.style.width = `${innerDiameter}px`;
+                whirlpoolInner.style.height = `${innerDiameter}px`;
+            }
+        }
+
+        // 进入横屏模式
+        function enterLandscape() {
+            const guide = document.getElementById('portrait-guide');
+            const main = document.getElementById('landscape-main');
+            
+            // 尝试锁定横屏（如果浏览器支持）
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(err => {
+                    console.log('无法锁定屏幕方向:', err);
+                });
+            }
+            
+            // 切换页面显示
+            guide.classList.add('hidden');
+            setTimeout(() => {
+                main.classList.add('active');
+                // 进入横屏后更新漩涡尺寸
+                updateWhirlpoolSize();
+            }, 300);
+        }
+
+        // 检测屏幕方向变化
+        function checkOrientation() {
+            const hint = document.getElementById('rotation-hint');
+            const isLandscape = window.innerWidth > window.innerHeight;
+            const main = document.getElementById('landscape-main');
+            
+            // 如果已经在横屏主页面
+            if (main.classList.contains('active')) {
+                if (!isLandscape) {
+                    // 切回竖屏，显示提示
+                    hint.classList.add('active');
+                } else {
+                    // 恢复横屏，隐藏提示
+                    hint.classList.remove('active');
+                    // 更新漩涡尺寸
+                    updateWhirlpoolSize();
+                }
+            }
+        }
+
+        // 按钮1点击事件
+        function handleButton1() {
+            alert('按钮1被点击了！');
+        }
+
+        // 按钮2点击事件
+        function handleButton2() {
+            alert('按钮2被点击了！');
+        }
+
+        // 监听屏幕方向变化和尺寸变化
+        window.addEventListener('resize', () => {
+            checkOrientation();
+            updateWhirlpoolSize();
+        });
+        window.addEventListener('orientationchange', () => {
+            checkOrientation();
+            updateWhirlpoolSize();
+        });
+
+        // 初始检查
+        checkOrientation();
+    </script>
+</body>
+</html>
